@@ -12,14 +12,14 @@
 
 void client(char domain[],char  path[])
 {
-int network_socket;//to hold info about the socket
+	int network_socket;//to hold info about the socket
 	network_socket =socket(AF_INET ,SOCK_STREAM,0);//0 referring to default TCP protocol
 
 	struct hostent *hos;
 	hos = gethostbyname(domain); //changing the host domain to ip address
 	if (hos == NULL){
-       herror("gethostbyname");
-       exit(1);
+        herror("gethostbyname");
+        exit(1);
         }
         
 	//specying an address for the socket
@@ -58,23 +58,23 @@ int network_socket;//to hold info about the socket
    	int data=0;
    
 
- //to download source code from a website and to print it in a file
+       //to download source code from a website and to print it in a file
 
-      while( data_rec= recv(network_socket, response, sizeof(response), 0)){
+       while( data_rec= recv(network_socket, response, sizeof(response), 0)){
     	 if( data_rec== -1 )
-	{
+	 {
 		perror("receive");
 		return;
-	}
-      data+=data_rec;
-      fwrite(response,1,data_rec,fp);
+	 }
+       data+=data_rec;
+       fwrite(response,1,data_rec,fp);
 
    		 if(data==-1)
 	  		  break; //when all the data is received ,data variable will become -1
-       }
-      printf("\nsource code received completely\n");
-      close(network_socket);
-      fclose(fp);
+        }
+       printf("\nsource code received completely\n");
+       close(network_socket);
+       fclose(fp);
       	}
  	
  		
