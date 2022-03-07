@@ -10,7 +10,7 @@
 #include<string.h>
 #include<netdb.h>
 
- int a;
+int a;
 int ReadHttpStatus(int sock){
     char c;
     char buff[1024]="",*ptr=buff+1;
@@ -60,7 +60,6 @@ int ParseHeader(int sock){
 
     *ptr=0;
     ptr=buff+4;
-    //printf("%s",ptr);
 
     if(bytes_received){
         ptr=strstr(ptr,"Content-Length:");
@@ -77,13 +76,14 @@ int ParseHeader(int sock){
 
 }
 
-int main(int argc,char* argv[])
+int depth_1()
 {
+
 	//tried for the tutorialspoint website
-	char path[]="cplusplus/index.htm";
-	char domain[]="www.tutorialspoint.com";
+	char path[]="\0";
+	char domain[]="www.gnu.org";
 	char* address;
-	address=argv[1];//as arg[0] would be ./socket
+	//address=argv[1];//as arg[0] would be ./socket
 	//creating a socket
 	int network_socket;//to hold info about the socket
 	network_socket =socket(AF_INET ,SOCK_STREAM,0);//0 referring to default TCP protocol
@@ -133,7 +133,7 @@ int main(int argc,char* argv[])
        if(ReadHttpStatus(network_socket) && (contentlengh=ParseHeader(network_socket))){
 
         int bytes=-(a+2);
-        FILE* fd=fopen("html_source_code_2","wb");
+        FILE* fd=fopen("html_source_code.txt","wb");
         printf("Saving data...\n\n");
 
         while(bytes_received = recv(network_socket, recv_data, 1024, 0)){
