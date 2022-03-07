@@ -9,10 +9,10 @@
 #include<string.h>
 #include<netdb.h>
 #include "client.c"
+#include "socket.c"
 
-void getLinks(){
-FILE* ptr=fopen("html_source_code.txt","r");
-FILE* fp=fopen("links.txt","w");
+void getLinks(FILE * fp,FILE * ptr){
+
 int ch;
 
  do{
@@ -39,7 +39,10 @@ int ch;
 	while((ch=fgetc(ptr))!='\"')
 	{
 	 	fputc(ch,fp);
+	 
 	 }
+	 
+	 
 	 
 	 if(ch=='\"')
 	 	fputc('\n',fp);
@@ -57,14 +60,12 @@ int ch;
  }while(ch!=EOF);
  
  fputc(ch,fp);
- fclose(ptr);
- fclose(fp);
+
  }
  
- void getHttpLinks()
+ void getHttpLinks(FILE * fp,FILE * ptr)
  {
-         FILE* ptr=fopen("links.txt","r");
-	 FILE* fp=fopen("http_links.txt","w");
+        
 	 int ch;
 
  do{
@@ -90,6 +91,7 @@ int ch;
 	while((ch=fgetc(ptr))!='\n')
 	{
 	 	fputc(ch,fp);
+	 	
 	 }
 	 
 	 fputc('\n',fp);
@@ -98,16 +100,15 @@ int ch;
 	 
  }while(ch!=EOF);
  
-// fputc(ch,fp);
- fclose(ptr);
- fclose(fp);
+
+
  
  
  }
 
- void getResponse()
+ void getResponse(FILE * ptr)
  {
- 	FILE* ptr=fopen("http_links.txt","r");
+ 	
  	
  	int ch;
  	char path[50];
@@ -134,14 +135,74 @@ int ch;
  	   
  	   client(domain,path);
  	   }
- 		fclose(ptr);
-	}		
- 			
+ 		
+	}	
+		
+ int nooflines(FILE* fp) 
+ {
+ 	int len=0;
+	int ch;
+	 while((ch=fgetc(fp))!=EOF)
+ 	{
+ 	  int i=0,j=0;
+ 	   while(ch!='/' && ch!='\n' && ch!=' ')
+ 	   {
+ 	   
+ 	   ch=fgetc(fp);
+ 	   }
+ 	   if(ch!='/')
+ 	   continue;
+ 		len++;
+ 	   if(ch!='\n' || ch!=' ')
+ 	   while((ch=fgetc(fp))!='\n');
+ 	   }	
+	
+	return len;
+}		
  
  int main()
  {
- 	getLinks();
- 	getHttpLinks();
- 	getResponse();
+ 	 depth_1();
+ 	 FILE* ptr=fopen("html_source_code.txt","r");
+	 FILE* fp=fopen("links.txt","w");
+ 	getLinks(fp,ptr);
+ 	fclose(fp);
+ 	fclose(ptr);
+ 	ptr=fopen("links.txt","r");
+ 	fp=fopen("http_links.txt","w");
+ 	getHttpLinks(fp,ptr);
+ 	fclose(fp);
+ 	fp=fopen("http_links.txt","r");
+ 	getResponse(fp);
+ 	fclose(fp);
+ 	 fclose(ptr);
+ 	fp=fopen("http_links.txt","r");
+ 	
+ 	int nooffiles=nooflines(fp);
+ 	printf("%d",nooffiles);
+ 	
+ 	FILE *filep=fopen("depth_2_http_links.txt","w");
+ 	for(int i=1;i<=nooffiles;i++)
+ 	{
+ 		FILE* p=fopen("depth_2_links.txt","w");
+ 		
+ 		char file_name[]="file";
+	
+		char s[10];
+		sprintf(s, "%d",i);
+		strcat(file_name,s);
+		
+    		FILE *fptr=fopen(file_name,"r");
+    		printf("%s \n",file_name);
+    		getLinks(p,fptr);
+    		fclose(p);
+    		FILE* pr=fopen("depth_2_links.txt","r");
+    		getHttpLinks(filep,pr);	
+    		fclose(fptr);
+    		fclose(pr);
+    	}
+    	fclose(filep);
+    	
+ 	fclose(fp);
  	return 0;
  }
