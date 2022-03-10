@@ -8,9 +8,12 @@
 #include<errno.h>
 #include<string.h>
 #include<netdb.h>
+#include<sys/stat.h>
 
+char path[50];
+char domain[50];
 
-void client(char domain[],char  path[])
+void client(int depth_number,int fileno)
 {
 	int network_socket;//to hold info about the socket
 	network_socket =socket(AF_INET ,SOCK_STREAM,0);//0 referring to default TCP protocol
@@ -23,6 +26,7 @@ void client(char domain[],char  path[])
         }
         
 	//specying an address for the socket
+	
 	struct sockaddr_in server_address;
 	server_address.sin_family =AF_INET ;
 	server_address.sin_port =htons(80);
@@ -48,20 +52,29 @@ void client(char domain[],char  path[])
 	
 	int data_rec;
 	char file_name[]="file";
-	flag++;
+	
 	char s[10];
-	sprintf(s, "%d",flag);
+	sprintf(s, "%d",fileno);
 	strcat(file_name,s);
-    	FILE *fp=fopen(file_name,"wb");
+	
+	struct stat st = {0};
+	char arr[40];
+	sprintf(arr,"bala/depth-%d",depth_number);
+	
+		
+	//creating a folder
+   	mkdir(arr, 0700);
+    	char array[60];
+    	sprintf(array,"%s/%s.txt",arr,file_name);
+    	FILE *fp=fopen(array,"wb");
     	
-   
    	int data=0;
    
 
        //to download source code from a website and to print it in a file
 
        while( data_rec= recv(network_socket, response, sizeof(response), 0)){
-    	 if( data_rec== -1 )
+    	 if( data_rec== -1 ) //if any error occured during the reception
 	 {
 		perror("receive");
 		return;
