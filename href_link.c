@@ -9,134 +9,48 @@
 #include<string.h>
 #include<netdb.h>
 #include "client.c"
-#include "socket.c"
-
-void getLinks(FILE * fp,FILE * ptr){
-
-int ch;
-
- do{
-	ch=fgetc(ptr);
-	if(ch=='<')
-	{
-	 if((ch=fgetc(ptr))=='a')
-	 {
-	  if((ch=fgetc(ptr))==' ')
-	  {
-	   if((ch=fgetc(ptr))=='h')
-	   {
-	    if((ch=fgetc(ptr))=='r')
-	    {
-	     if((ch=fgetc(ptr))=='e')
-	     {
-	      if((ch=fgetc(ptr))=='f')
-	      {
-		if((ch=fgetc(ptr))=='=')
-		{
-		 if((ch=fgetc(ptr))=='\"') 
-		 {    
-		 
-	while((ch=fgetc(ptr))!='\"')
-	{
-	 	fputc(ch,fp);
-	 
-	 }
-	 
-	 
-	 
-	 if(ch=='\"')
-	 	fputc('\n',fp);
-	        }
-	       }
-              }
-            }
-           }
-          }
-         }
-        }
-       }
-	
-	 
- }while(ch!=EOF);
- 
- fputc(ch,fp);
-
- }
- 
- void getHttpLinks(FILE * fp,FILE * ptr)
- {
-        
-	 int ch;
-
- do{
-	ch=fgetc(ptr);
-	if(ch=='h')
-	{
-	 if((ch=fgetc(ptr))=='t')
-	 {
-	  if((ch=fgetc(ptr))=='t')
-	  {
-	   if((ch=fgetc(ptr))=='p')
-	   {
-	    if((ch=fgetc(ptr))=='s')
-	    {
-	     if((ch=fgetc(ptr))==':')
-	     {
-	      if((ch=fgetc(ptr))=='/')
-	      {
-		if((ch=fgetc(ptr))=='/')
-		{
-	
-		 
-	while((ch=fgetc(ptr))!='\n')
-	{
-	 	fputc(ch,fp);
-	 	
-	 }
-	 
-	 fputc('\n',fp);
-	 }}}}}}}}
-	
-	 
- }while(ch!=EOF);
- 
 
 
- 
- 
- }
 
- void getResponse(FILE * ptr)
+
+
+
+int depths[11]={0};
+extern char domain[];
+extern char path[];
+
+
+
+
+
+ void getResponse(char* link)
  {
  	
  	
- 	int ch;
- 	char path[50];
- 	char domain[50];
- 	
- 	 while((ch=fgetc(ptr))!=EOF)
- 	{
- 	  int i=0,j=0;
- 	   while(ch!='/' && ch!='\n' && ch!=' ')
- 	   {
- 	   domain[i++]=ch;
- 	   ch=fgetc(ptr);
- 	   }
- 	   if(ch!='/')
- 	   continue;
- 	   domain[i]='\0';
- 	   if(ch!='\n' || ch!=' ')
- 	   while((ch=fgetc(ptr))!='\n')
- 	   {
- 	   path[j++]=ch;
- 	   }
- 	   path[j]='\0';
- 	  
- 	   
- 	   client(domain,path);
- 	   }
- 		
-	}	
+ 	int ch,x=0;
+ 	 printf("domain :%s \n path: %s  \n link: %s",domain,path,link);
+ 	int i=0,j=0;
+ 	 while((domain[i++]=link[x++])!='/')
+ 	 {
+ 	 putchar(domain[i]);
+ 	 if(domain[i-1]=='\n')
+ 	 	{
+ 	 		domain[i-1]='\0';
+ 	 		path[j]='\0';
+ 	 		return ;
+ 	 	}
+ 	 }
+ 	 domain[i-1]='\0';
+ 	 while((path[j++]=link[x++])!='\n');
+ 	 path[j-1]='\0';
+ 	  printf("\n domain :%s \n path: %s  \n link: %s",domain,path,link);
+ }	
+		
+void fn_name(int depthno,int fileno, char * arr)
+{
+	sprintf(arr,"bala/depth-%d/file%d.txt",depthno,fileno);
+}
+
 		
  int nooflines(FILE* fp) 
  {
@@ -158,11 +72,123 @@ int ch;
  	   }	
 	
 	return len;
-}		
- 
- int main()
+}	
+
+
+ void getHttpLinks(FILE * ptr)
  {
- 	 depth_1();
+        
+	 int ch,i=0;
+	 char link[100];
+
+
+	ch=fgetc(ptr);
+	if(ch=='h')
+	{
+	 if((ch=fgetc(ptr))=='t')
+	 {
+	  if((ch=fgetc(ptr))=='t')
+	  {
+	   if((ch=fgetc(ptr))=='p')
+	   {
+	    if((ch=fgetc(ptr))=='s')
+	    {
+	     if((ch=fgetc(ptr))==':')
+	     {
+	      if((ch=fgetc(ptr))=='/')
+	      {
+		if((ch=fgetc(ptr))=='/')
+		{
+	
+		 
+	while((ch=fgetc(ptr))!='\"')
+	{
+	 	link[i++]=ch;
+	 	
+	 }
+	 
+	 link[i]='\n';
+	 getResponse(link);
+	 }}}}}}}}
+ }	
+ 
+ 
+ void getLinks(int depth_number){
+
+	int ch;
+	if(depth_number>10 || (depths[depth_number]!=0))
+		return ;
+	int fileno=0;
+	char arr[100];
+	fn_name(depth_number,fileno,arr);
+	FILE* ptr=fopen(arr,"r");
+	
+
+ do{
+	ch=fgetc(ptr);
+	if(ch=='<')
+	{
+	 if((ch=fgetc(ptr))=='a')
+	 {
+	  if((ch=fgetc(ptr))==' ')
+	  {
+	   if((ch=fgetc(ptr))=='h')
+	   {
+	    if((ch=fgetc(ptr))=='r')
+	    {
+	     if((ch=fgetc(ptr))=='e')
+	     {
+	      if((ch=fgetc(ptr))=='f')
+	      {
+		if((ch=fgetc(ptr))=='=')
+		{
+		 if((ch=fgetc(ptr))=='\"') 
+		 {    	
+		 
+	
+	
+	 	getHttpLinks(ptr);
+	 
+	 
+	 
+	 client(depth_number+1,fileno);
+	 if(fileno>20 )
+	 {
+	 	depths[depth_number]=fileno;
+	 	return ;
+	 }
+	 getLinks(depth_number+1);
+	 printf("filenumber=%d depthnumber-%d \n",fileno,depth_number);
+	 fileno++;
+	 
+	 
+	
+	        }
+	       }
+              }
+             }
+            }
+           }
+          }
+         }
+        }
+	
+	 
+ }while(ch!=EOF);
+ 
+ }
+ 
+ 
+ int main(int argc,char* argv[])
+ {
+ 
+ 	int depth_number=0;
+ 	strcpy(domain,argv[1]);
+ 	strcpy(path,argv[2]);
+	client(depth_number,0);
+	getLinks(depth_number);
+ 	
+ 	/* depth_1();
  	 FILE* ptr=fopen("html_source_code.txt","r");
 	 FILE* fp=fopen("links.txt","w");
  	getLinks(fp,ptr);
@@ -187,13 +213,13 @@ int ch;
  		FILE* p=fopen("depth_2_links.txt","w");
  		
  		char file_name[]="file";
-	
+		
 		char s[10];
 		sprintf(s, "%d",i);
 		strcat(file_name,s);
-		
-    		FILE *fptr=fopen(file_name,"r");
-    		printf("%s \n",file_name);
+		char charr[40];
+		sprintf(charr,"bala/%s/%s.txt",file_name,file_name);
+    		FILE *fptr=fopen(charr,"r");
     		getLinks(p,fptr);
     		fclose(p);
     		FILE* pr=fopen("depth_2_links.txt","r");
@@ -204,5 +230,5 @@ int ch;
     	fclose(filep);
     	
  	fclose(fp);
- 	return 0;
+ 	return 0;*/
  }
