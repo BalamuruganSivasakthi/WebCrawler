@@ -52,34 +52,13 @@ void fn_name(int depthno,int fileno, char * arr)
 }
 
 		
- int nooflines(FILE* fp) 
- {
- 	int len=0;
-	int ch;
-	 while((ch=fgetc(fp))!=EOF)
- 	{
- 	  int i=0,j=0;
- 	   while(ch!='/' && ch!='\n' && ch!=' ')
- 	   {
- 	   
- 	   ch=fgetc(fp);
- 	   }
- 	   if(ch!='/')
- 	   continue;
- 		len++;
- 	   if(ch!='\n' || ch!=' ')
- 	   while((ch=fgetc(fp))!='\n');
- 	   }	
-	
-	return len;
-}	
 
 
- void getHttpLinks(FILE * ptr)
+void getHttpLinks(FILE * ptr,char* link)
  {
         
 	 int ch,i=0;
-	 char link[100];
+	
 
 
 	ch=fgetc(ptr);
@@ -108,8 +87,10 @@ void fn_name(int depthno,int fileno, char * arr)
 	 }
 	 
 	 link[i]='\n';
+	 link[i+1]='\0';
 	 getResponse(link);
 	 }}}}}}}}
+	
  }	
  
  
@@ -147,11 +128,12 @@ void fn_name(int depthno,int fileno, char * arr)
 		 
 	
 	
-	 	getHttpLinks(ptr);
+	 char link[100];
+	 getHttpLinks(ptr,link);
 	 
 	 
 	 
-	 client(depth_number+1,fileno);
+	 client(depth_number+1,fileno,link);
 	 if(fileno>20 )
 	 {
 	 	depths[depth_number]=fileno;
@@ -185,7 +167,9 @@ void fn_name(int depthno,int fileno, char * arr)
  	int depth_number=0;
  	strcpy(domain,argv[1]);
  	strcpy(path,argv[2]);
-	client(depth_number,0);
+ 	char link[102];
+ 	sprintf(link,"%s/%s\n",domain,path);
+	client(depth_number,0,link);
 	getLinks(depth_number);
  	
  	/* depth_1();
