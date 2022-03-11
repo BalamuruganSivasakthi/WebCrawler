@@ -13,7 +13,7 @@
 char path[50];
 char domain[50];
 
-void client(int depth_number,int fileno)
+void client(int depth_number,int fileno,char* link)
 {
 	int network_socket;//to hold info about the socket
 	network_socket =socket(AF_INET ,SOCK_STREAM,0);//0 referring to default TCP protocol
@@ -67,7 +67,7 @@ void client(int depth_number,int fileno)
     	char array[60];
     	sprintf(array,"%s/%s.txt",arr,file_name);
     	FILE *fp=fopen(array,"wb");
-    	
+    	fputs(link,fp);
    	int data=0;
    
 
