@@ -46,9 +46,9 @@ extern char path[];
  	  printf("\n domain :%s \n path: %s  \n link: %s",domain,path,link);
  }	
 		
-void fn_name(int depthno,int fileno, char * arr)
+void fn_name(int depthno,int fileno, char * arr,char dir[])
 {
-	sprintf(arr,"bala/depth-%d/file%d.txt",depthno,fileno);
+	sprintf(arr,"%s/file%d.txt",dir,fileno);
 }
 
 		
@@ -93,15 +93,44 @@ void getHttpLinks(FILE * ptr,char* link)
 	
  }	
  
+ void dir_name(int depth_number,char dir[])
+ {
+ 	char arr[10];
+ 	//if(depth_number==1)
+ 	sprintf(arr,"/depth-%d",depth_number);
+ 	//else
+ 	//sprintf(arr,"depth-%d",depth_number);
+ 	strcat(dir,arr);
+ 	printf(" \n %s \n ",dir);
+ } 
  
- void getLinks(int depth_number){
+ void remo(char dir[])
+ {
+ 	int len;
+ 	len=strlen(dir);
+ 	len--;
+ 	while(dir[len]!='/')
+ 		len--;
+ 	dir[len]='\0';
+ }
+ 	
+ 
+ void getLinks(int depth_number,char dir[]){
 
+	
 	int ch;
+	static int flag=0;
 	if(depth_number>10 || (depths[depth_number]!=0))
+	{
+		flag=1;
 		return ;
+	}
 	int fileno=0;
-	char arr[100];
-	fn_name(depth_number,fileno,arr);
+	char arr[200];
+
+	printf(" \n %s \n ",dir);
+	fn_name(depth_number,fileno,arr,dir);
+	printf(" \n %s \n", arr);
 	FILE* ptr=fopen(arr,"r");
 	
 
@@ -132,14 +161,16 @@ void getHttpLinks(FILE * ptr,char* link)
 	 getHttpLinks(ptr,link);
 	 
 	 
-	 
-	 client(depth_number+1,fileno,link);
+	if( !flag)
+	dir_name(depth_number,dir);
+	 client(depth_number+1,fileno,link,dir);
 	 if(fileno>20 )
 	 {
 	 	depths[depth_number]=fileno;
+	 	remo(dir);
 	 	return ;
 	 }
-	 getLinks(depth_number+1);
+	 getLinks(depth_number+1,dir);
 	 printf("filenumber=%d depthnumber-%d \n",fileno,depth_number);
 	 fileno++;
 	 
@@ -158,6 +189,7 @@ void getHttpLinks(FILE * ptr,char* link)
 	 
  }while(ch!=EOF);
  
+ 
  }
  
  
@@ -165,12 +197,13 @@ void getHttpLinks(FILE * ptr,char* link)
  {
  
  	int depth_number=0;
+        char dir[100]="bala/";
  	strcpy(domain,argv[1]);
  	strcpy(path,argv[2]);
  	char link[102];
  	sprintf(link,"%s/%s\n",domain,path);
-	client(depth_number,0,link);
-	getLinks(depth_number);
+	client(depth_number,0,link,dir);
+	getLinks(depth_number,dir);
  	
  	/* depth_1();
  	 FILE* ptr=fopen("html_source_code.txt","r");
