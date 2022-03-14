@@ -13,7 +13,7 @@
 char path[50];
 char domain[50];
 
-void client(int depth_number,int fileno,char* link)
+void client(int depth_number,int fileno,char* link,char dir[])
 {
 	int network_socket;//to hold info about the socket
 	network_socket =socket(AF_INET ,SOCK_STREAM,0);//0 referring to default TCP protocol
@@ -58,14 +58,15 @@ void client(int depth_number,int fileno,char* link)
 	strcat(file_name,s);
 	
 	struct stat st = {0};
-	char arr[40];
-	sprintf(arr,"bala/depth-%d",depth_number);
+	//char arr[40];
+	//sprintf(arr,"depth-%d",depth_number);
 	
-		
+		//if(depth_number==0)
+		//	strcat(dir,"depth-0");
 	//creating a folder
-   	mkdir(arr, 0700);
-    	char array[60];
-    	sprintf(array,"%s/%s.txt",arr,file_name);
+   	mkdir(dir, 0700);
+    	char array[120];
+    	sprintf(array,"%s/%s.txt",dir,file_name);
     	FILE *fp=fopen(array,"wb");
     	fputs(link,fp);
    	int data=0;
