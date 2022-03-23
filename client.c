@@ -14,11 +14,11 @@ char path[50];
 char domain[50];
 
 
-void client(int depth_number,int fileno,char* link,char dir[])
+void client(int depth_number,int fileno,char* link,char dir[],char* domain,char* path)
 {
 
   int network_socket;					//to hold info about the socket
-  network_socket =socket(AF_INET ,SOCK_STREAM,0);	//0 referring to default TCP protocol
+  network_socket =socket(AF_INET ,SOCK_STREAM,0);	//3rd argument 0 referring to default TCP protocol
 
   struct hostent *hos;
   hos = gethostbyname(domain); 			//changing the host domain to ip address
@@ -56,27 +56,20 @@ void client(int depth_number,int fileno,char* link,char dir[])
   char s[10];
   sprintf(s, "%d",fileno);
   strcat(file_name,s);
-  char fol[150];
-  sprintf(fol,"%s/%s",dir,file_name);
-  printf("\n fol-%s \n",fol);
-  
   
   struct stat st={0};
-  mkdir(dir,0700);
-  mkdir(fol, 0700);     	//to create a folder with dir as name in read,write and execution mode
-   	
+  mkdir(dir, 0700); 	  			// to create a folder in a read,write ,executable form
   char array[200];
-  sprintf(array,"%s/%s.txt",fol,file_name);
-  printf("\n array  %s \n",array);
+  sprintf(array,"%s/%s.txt",dir,file_name);
   FILE *fp=fopen(array,"wb");
-  fputs(link,fp);		//first putting the link of the website at the top of the file
+  fputs(link,fp);				//first putting the link of the website at the top of the file
   int data=0;
    
-  				//to download source code from a website and to print it in a file
+  //to download source code from a website and to print it in a file
 
   while( data_rec= recv(network_socket, response, sizeof(response), 0))
   {
-  if( data_rec== -1 ) 		//if any error occured during the reception
+  if( data_rec== -1 ) 				//if any error occured during the reception
   {
   perror("receive");
   return;
@@ -84,10 +77,9 @@ void client(int depth_number,int fileno,char* link,char dir[])
   data+=data_rec;
   fwrite(response,1,data_rec,fp);
   if(data==-1)
-  break;			 //when all the data is received ,data variable will become -1
+  break;				       //when all the data is received ,data variable will become -1
   }
   printf("\nsource code received completely\n");
   close(network_socket);
   fclose(fp);
 }
- 	
