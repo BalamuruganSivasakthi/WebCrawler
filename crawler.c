@@ -9,22 +9,22 @@
 #include<string.h>
 #include<netdb.h>
 #include "client.c"
-#include "domain.c"
+#include "Indepth_crawler.c"
 
 int depths[11]={0};
 extern char domain[];
 extern char path[];
+int depth_no,file_no;
 
 
-
-void getDomainPath(char* link)	 //to separte domain and path from the link
+void getDomainPath(char* link)	  //to separte domain and path from the link
 {
   int ch,x=0;
   int i=0,j=0;
-  while((domain[i++]=link[x++])!='/')
+  while((domain[i++]=link[x++])!='/')   //extracting domain from the link
   {
   putchar(domain[i]);
-  if(domain[i-1]=='\n')		//if the path is not available ,it will assign the path to be '\0'
+  if(domain[i-1]=='\n')		 //if the path is not available ,it will assign the path to be '\0'
     {
      domain[i-1]='\0';
      path[j]='\0';	
@@ -32,18 +32,20 @@ void getDomainPath(char* link)	 //to separte domain and path from the link
     }
   }
   domain[i-1]='\0';
-  while((path[j++]=link[x++])!='\n');
+  while((path[j++]=link[x++])!='\n');  //extracting path from the link
   path[j-1]='\0';
 }	
 
 		
-void fileName(int depthno,int fileno, char * arr,char dir[]) //to assign the file name  with the exact depth number and file number
+//to assign the file name  with the exact depth number and file number		
+void fileName(int depthno,int fileno, char * arr,char dir[]) 
 {
   sprintf(arr,"%s/file%d.txt",dir,fileno);
 }
 
 
-int getHttpLinks(FILE * ptr,char* link,FILE* URLS) //this function is to check whether we are gwtting 'https' after 'a href' or not
+//function to check whether we are gwtting 'https' after 'a href' or not
+int getHttpLinks(FILE * ptr,char* link,FILE* URLS) 
 {     
   int ch,i=0;
   if((ch=fgetc(ptr))=='h' && (ch=fgetc(ptr))=='t'&& (ch=fgetc(ptr))=='t'&& (ch=fgetc(ptr))=='p' && (ch=fgetc(ptr))=='s' && (ch=fgetc(ptr))==':' && (ch=fgetc(ptr))=='/' && (ch=fgetc(ptr))=='/')
@@ -69,7 +71,8 @@ void directoryName(int depth_number,char dir[])  //to assign the folder name
 } 
  
  
-void removeLastDepth(char dir[]) //while backtracking we have to remove the depth10 depth9 depth8 so on to get proper depth
+//function to change the directory name ,while backtracking
+void removeLastDepth(char dir[]) 
 {
   int len;
   len=strlen(dir);
@@ -84,7 +87,7 @@ void getLinks(int depth_number,char dir[],FILE * URLS)  //recursive function use
 {
   int ch;
   static int flag=0;
-  if(depth_number>1 || (depths[depth_number]!=0))
+  if(depth_number>depth_no-1 || (depths[depth_number]!=0))
   {
     flag=1;
     return ;
@@ -94,21 +97,19 @@ void getLinks(int depth_number,char dir[],FILE * URLS)  //recursive function use
   fileName(depth_number,fileno,arr,dir);
   FILE* ptr=fopen(arr,"r");
 	
-do
+do  							
   {
   if((ch=fgetc(ptr))=='a' && (ch=fgetc(ptr))==' '&& (ch=fgetc(ptr))=='h'&& (ch=fgetc(ptr))=='r' && (ch=fgetc(ptr))=='e' && (ch=fgetc(ptr))=='f' && (ch=fgetc(ptr))=='=' && (ch=fgetc(ptr))=='\"')
   {
   char link[100];
   int check;
   check=getHttpLinks(ptr,link,URLS);
-
- // char* domain,*path;
   int len=strlen(link);
  	 
   if( !flag)
   directoryName(depth_number,dir);
   client(depth_number+1,fileno,link,dir,domain,path);
-  if(fileno>20)
+  if(fileno>file_no-1)
   {
     depths[depth_number]=fileno;
     removeLastDepth(dir);
@@ -123,7 +124,7 @@ do
 
 int main(int argc,char* argv[])
 { 
-  FILE *URLS=fopen("Urls.txt","w");  //to print all the website URLs crawled 
+  FILE *URLS=fopen("bala/Urls.txt","w");  //to print all the website URLs crawled 
   int depth_number=0;
   char domain[100];
   char path[100];
@@ -138,28 +139,34 @@ int main(int argc,char* argv[])
   
   //for crawling through more  websites from the same depth files
   
-  char ab[100]="bala";
-  for(int i=0;i<2;i++)
+  char main_folder[100]="bala";		//initializing the folder name to "bala" to get into that folder
+  
+  printf("Enter upto which depth you want to crawl");
+  scanf("%d",&depth_no);
+  printf("Enter how many files you want to crawl from each depth");
+  scanf("%d",&file_no);
+  
+  for(int i=0;i<depth_no;i++) 	 //for depth_number
   {
-    char mn[10];
+    char folder_name[10];
     char previous_link[100];
-    sprintf(mn,"/depth-%d",i);
-    strcat(ab,mn);
-    for(int j=1;j<=21;j++)
+    sprintf(folder_name,"/depth-%d",i);
+    strcat(main_folder,folder_name);
+    
+    for(int j=1;j<=file_no;j++)	//for file number
     {
-     char bc[100];
-     sprintf(bc,"depth-%d_file-%d",i,j);
+     char pre_file_name[100];
+     sprintf(pre_file_name,"depth-%d_file-%d",i,j);
      
-     char xy[200];
-     sprintf(xy,"%s/file%d.txt",ab,j);
-     FILE* fp=fopen(xy,"r");
+     char file_name[200];
+     sprintf(file_name,"%s/file%d.txt",main_folder,j);
+     FILE* fp=fopen(file_name,"r");
      int k=0;
      while((previous_link[k++]=fgetc(fp))!='\n');
      previous_link[k]='\0';
-     getUrls(fp,ab,bc,previous_link,URLS);
+     getUrls(fp,main_folder,pre_file_name,previous_link,URLS);
      fclose(fp);
     }
    }  	
 }
-
 
